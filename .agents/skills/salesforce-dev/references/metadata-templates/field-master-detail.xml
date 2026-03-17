@@ -1,0 +1,33 @@
+<!--
+  Master-Detail Relationship Field Template
+
+  File path: force-app/main/default/objects/OBJECT_NAME__c/fields/FIELD_NAME__c.field-meta.xml
+
+  CRITICAL: The child object's sharingModel MUST be ControlledByParent.
+  Use custom-object-controlled-by-parent.xml for the object definition.
+  See relationships.md for full details.
+
+  Replace:
+    - FIELD_NAME: API name without __c (e.g., "Property")
+    - FIELD_LABEL: Human-readable label (e.g., "Property")
+    - PARENT_OBJECT: The master object (e.g., "Property__c")
+    - RELATIONSHIP_NAME: API name for the child relationship
+    - RELATIONSHIP_LABEL: Label shown on the master's Related list
+
+  Notes:
+    - relationshipOrder: 0 for the first M-D on this object, 1 for the second (max 2)
+    - reparentableMasterDetail: Whether child records can be reassigned to a different parent
+    - FLS is NOT needed for Master-Detail fields (they are always visible)
+-->
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>FIELD_NAME__c</fullName>
+    <label>FIELD_LABEL</label>
+    <referenceTo>PARENT_OBJECT</referenceTo>
+    <relationshipLabel>RELATIONSHIP_LABEL</relationshipLabel>
+    <relationshipName>RELATIONSHIP_NAME</relationshipName>
+    <relationshipOrder>0</relationshipOrder>
+    <reparentableMasterDetail>false</reparentableMasterDetail>
+    <type>MasterDetail</type>
+    <writeRequiresMasterRead>false</writeRequiresMasterRead>
+</CustomField>

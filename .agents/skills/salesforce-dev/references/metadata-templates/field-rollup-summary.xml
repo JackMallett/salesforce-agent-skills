@@ -1,0 +1,35 @@
+<!--
+  Roll-Up Summary Field Template
+
+  File path: force-app/main/default/objects/MASTER_OBJECT/fields/FIELD_NAME__c.field-meta.xml
+
+  Roll-up summary fields MUST be on the master side of a master-detail relationship.
+  They can also be on standard objects with built-in master-detail relationships
+  (e.g., Account -> Opportunity via AccountId).
+
+  Attributes:
+    - summarizedField: The detail object field to aggregate (e.g., Opportunity.ExpectedRevenue)
+    - summaryForeignKey: The lookup/master-detail field linking detail to master (e.g., Opportunity.AccountId)
+    - summaryOperation: count, sum, min, or max
+    - summaryFilterItems: (Optional) Filter which detail records to include
+
+  Available operations by field type:
+    - count: No summarizedField needed (counts all related records)
+    - sum: Number, Currency, Percent fields only
+    - min/max: Number, Currency, Percent, Date, DateTime fields
+
+  For count operations, omit the <summarizedField> element entirely.
+
+  Roll-up summary fields are READ-ONLY. In FLS, set editable to false.
+
+  REMEMBER: You MUST add an FLS entry in Admin.profile-meta.xml with editable=false, readable=true.
+-->
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>FIELD_NAME__c</fullName>
+    <label>FIELD_LABEL</label>
+    <summarizedField>DETAIL_OBJECT.FIELD_API_NAME</summarizedField>
+    <summaryForeignKey>DETAIL_OBJECT.FOREIGN_KEY_FIELD</summaryForeignKey>
+    <summaryOperation>sum</summaryOperation>
+    <type>Summary</type>
+</CustomField>

@@ -1,0 +1,31 @@
+<!--
+  Lookup Relationship Field Template
+
+  File path: force-app/main/default/objects/OBJECT_NAME__c/fields/FIELD_NAME__c.field-meta.xml
+
+  Replace:
+    - FIELD_NAME: API name without __c (e.g., "Contact")
+    - FIELD_LABEL: Human-readable label (e.g., "Contact")
+    - TARGET_OBJECT: The object being referenced (e.g., "Contact" for standard, "Property__c" for custom)
+    - RELATIONSHIP_NAME: API name for the relationship (used in SOQL for reverse queries)
+    - RELATIONSHIP_LABEL: Label shown on the parent's Related list
+
+  deleteConstraint options:
+    - SetNull: Clear the field when parent is deleted (most common)
+    - Restrict: Prevent parent deletion if children exist
+    - Cascade: Delete children when parent is deleted (rare for lookups)
+
+  REMEMBER: If required is false, you MUST add an FLS entry in Admin.profile-meta.xml.
+  See field-level-security.md and profiles-and-permissions.md.
+-->
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>FIELD_NAME__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>FIELD_LABEL</label>
+    <referenceTo>TARGET_OBJECT</referenceTo>
+    <relationshipLabel>RELATIONSHIP_LABEL</relationshipLabel>
+    <relationshipName>RELATIONSHIP_NAME</relationshipName>
+    <required>false</required>
+    <type>Lookup</type>
+</CustomField>

@@ -1,0 +1,25 @@
+<!--
+  Admin Profile — Field-Level Security Template
+
+  File path: force-app/main/default/profiles/Admin.profile-meta.xml
+
+  Add one <fieldPermissions> block for each custom field that needs to be visible.
+
+  DO NOT add entries for:
+    - Required fields (required=true) — automatically visible
+    - Master-Detail relationship fields — automatically visible
+  Adding FLS for these will cause the deploy to fail.
+
+  To grant access to other profiles, create additional profile files
+  (e.g., Standard.profile-meta.xml) with the same structure.
+  See profiles-and-permissions.md for details.
+-->
+<?xml version="1.0" encoding="UTF-8"?>
+<Profile xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>OBJECT_NAME__c.FIELD_NAME__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <!-- Add more <fieldPermissions> blocks as needed -->
+</Profile>

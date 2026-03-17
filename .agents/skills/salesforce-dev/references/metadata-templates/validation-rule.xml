@@ -1,0 +1,38 @@
+<!--
+  Validation Rule Template
+
+  File path: force-app/main/default/objects/OBJECT_NAME/validationRules/RULE_NAME.validationRule-meta.xml
+
+  Works on both standard objects (Account, Contact, Opportunity, etc.) and custom objects.
+
+  Attributes:
+    - fullName: The API name of the rule (must match filename without extension)
+    - active: true or false
+    - errorConditionFormula: Formula that returns TRUE when data is INVALID
+      (i.e., TRUE = show error, FALSE = allow save)
+    - errorMessage: Text shown to user when validation fails
+    - errorDisplayField: (Optional) API name of field to display error on.
+      If omitted, error shows at top of page.
+
+  IMPORTANT: In XML, the <> (Not Equal) operator must be escaped as &lt;&gt;
+  Other operators that need escaping: < as &lt;, > as &gt;, & as &amp;
+
+  Common formula functions for validation rules:
+    - ISBLANK(field): True if field is empty
+    - NOT(expr): Negates a boolean expression
+    - AND(expr1, expr2, ...): True if ALL expressions are true
+    - OR(expr1, expr2, ...): True if ANY expression is true
+    - LEN(text): Length of text string
+    - ISNUMBER(text): True if text is numeric
+    - CONTAINS(text, search): True if text contains search
+    - REGEX(text, pattern): True if text matches regex pattern
+
+  No FLS or profile changes are needed for validation rules.
+-->
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RULE_NAME</fullName>
+    <active>true</active>
+    <errorConditionFormula>YOUR_FORMULA_HERE</errorConditionFormula>
+    <errorMessage>Your error message here.</errorMessage>
+</ValidationRule>
