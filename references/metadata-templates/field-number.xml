@@ -1,0 +1,22 @@
+<!--
+  Number Field Template
+
+  File path: force-app/main/default/objects/OBJECT_NAME__c/fields/FIELD_NAME__c.field-meta.xml
+
+  Attributes:
+    - precision: Total number of digits (max 18). Includes digits before AND after decimal.
+    - scale: Number of decimal places. Use 0 for integers.
+
+  For Percent fields, change <type> to Percent.
+
+  REMEMBER: If required is false, you MUST add an FLS entry in Admin.profile-meta.xml.
+-->
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>FIELD_NAME__c</fullName>
+    <label>FIELD_LABEL</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <type>Number</type>
+</CustomField>

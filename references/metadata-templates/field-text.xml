@@ -1,0 +1,46 @@
+<!--
+  Text / TextArea Field Template
+
+  File path: force-app/main/default/objects/OBJECT_NAME__c/fields/FIELD_NAME__c.field-meta.xml
+
+  Type options:
+    - Text: Single-line text (requires <length>, max 255)
+    - TextArea: Multi-line text, up to 255 characters
+    - LongTextArea: Up to 131,072 characters (requires <length> and <visibleLines>)
+    - RichTextArea: HTML-formatted text (requires <length> and <visibleLines>)
+
+  REMEMBER: If required is false, you MUST add an FLS entry in Admin.profile-meta.xml.
+-->
+
+<!-- Text (single-line, max 255 chars) -->
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>FIELD_NAME__c</fullName>
+    <label>FIELD_LABEL</label>
+    <length>255</length>
+    <required>false</required>
+    <type>Text</type>
+</CustomField>
+
+<!--
+  TextArea variant — replace the body with:
+
+  <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+      <fullName>FIELD_NAME__c</fullName>
+      <label>FIELD_LABEL</label>
+      <required>false</required>
+      <type>TextArea</type>
+  </CustomField>
+-->
+
+<!--
+  LongTextArea variant — replace the body with:
+
+  <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+      <fullName>FIELD_NAME__c</fullName>
+      <label>FIELD_LABEL</label>
+      <length>32768</length>
+      <type>LongTextArea</type>
+      <visibleLines>5</visibleLines>
+  </CustomField>
+-->

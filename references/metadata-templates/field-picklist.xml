@@ -1,0 +1,42 @@
+<!--
+  Picklist Field Template
+
+  File path: force-app/main/default/objects/OBJECT_NAME__c/fields/FIELD_NAME__c.field-meta.xml
+
+  Replace VALUE_1, VALUE_2, etc. with your picklist values.
+  Set isActive to false to hide a value without deleting it.
+  Set <default>true</default> on one value to make it the default selection.
+
+  For a Multi-Select Picklist, change <type> to MultiselectPicklist
+  and add <visibleLines>4</visibleLines>.
+
+  REMEMBER: If required is false, you MUST add an FLS entry in Admin.profile-meta.xml.
+-->
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>FIELD_NAME__c</fullName>
+    <label>FIELD_LABEL</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>VALUE_1</fullName>
+                <default>false</default>
+                <label>VALUE_1</label>
+            </value>
+            <value>
+                <fullName>VALUE_2</fullName>
+                <default>false</default>
+                <label>VALUE_2</label>
+            </value>
+            <value>
+                <fullName>VALUE_3</fullName>
+                <default>false</default>
+                <label>VALUE_3</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

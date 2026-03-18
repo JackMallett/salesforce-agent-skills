@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- File path: force-app/main/default/tabs/<ObjectName>__c.tab-meta.xml -->
+<!-- The tab filename must match the custom object API name -->
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customObject>true</customObject>
+    <!-- motif controls the tab icon/color. Format: "Custom<N>: <Label>" -->
+    <!-- Example values: Custom66: Sun, Custom1: Heart, Custom2: Dollar Sign -->
+    <!-- Deploy will fail with an invalid motif — retrieve an existing tab to see valid values -->
+    <motif>Custom66: Sun</motif>
+</CustomTab>

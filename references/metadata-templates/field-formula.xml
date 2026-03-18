@@ -1,0 +1,28 @@
+<!--
+  Formula Field Template
+
+  File path: force-app/main/default/objects/OBJECT_NAME/fields/FIELD_NAME__c.field-meta.xml
+
+  Works on both standard objects (Account, Contact, Contract, Opportunity, etc.) and custom objects.
+
+  Attributes:
+    - formula: The formula expression (e.g., EndDate - TODAY(), Amount * Probability)
+    - formulaTreatBlanksAs: BlankAsZero or BlankAsBlank
+    - type: The return type — Number, Currency, Text, Date, Checkbox, Percent, etc.
+    - precision/scale: For Number/Currency/Percent return types (precision = total digits, scale = decimal places)
+
+  Formula fields are READ-ONLY. In FLS, set editable to false.
+
+  REMEMBER: If required is false (default for formula fields), you MUST add an FLS entry in Admin.profile-meta.xml
+  with editable=false and readable=true.
+-->
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>FIELD_NAME__c</fullName>
+    <label>FIELD_LABEL</label>
+    <formula>YOUR_FORMULA_HERE</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <precision>18</precision>
+    <scale>0</scale>
+    <type>Number</type>
+</CustomField>

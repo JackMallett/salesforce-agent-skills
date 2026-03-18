@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- File path: force-app/main/default/objects/<ObjectName>/compactLayouts/<LayoutName>.compactLayout-meta.xml -->
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>LAYOUT_API_NAME</fullName>
+    <!-- Fields appear in the highlights panel at the top of record pages -->
+    <!-- First field displays at the top in bold -->
+    <!-- Use API field names (e.g., Name, StageName, CloseDate, OwnerId) -->
+    <fields>Name</fields>
+    <fields>Probability</fields>
+    <fields>CloseDate</fields>
+    <fields>StageName</fields>
+    <fields>Amount</fields>
+    <fields>OwnerId</fields>
+    <label>Layout Display Label</label>
+</CompactLayout>
+<!--
+  To make this the PRIMARY compact layout, set compactLayoutAssignment
+  on the CustomObject metadata:
+
+  <compactLayoutAssignment>LAYOUT_API_NAME</compactLayoutAssignment>
+
+  Deploy both the CompactLayout file AND the updated object file together.
+-->

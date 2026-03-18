@@ -1,0 +1,24 @@
+<!--
+  Custom Object Template — ControlledByParent Sharing
+
+  Use this when the object will be the DETAIL (child) side of a
+  Master-Detail relationship.
+
+  File path: force-app/main/default/objects/OBJECT_NAME__c/OBJECT_NAME__c.object-meta.xml
+
+  IMPORTANT: Both sharingModel and externalSharingModel MUST be
+  ControlledByParent. If they are set to ReadWrite, the deploy will fail with:
+  "Cannot set sharingModel to ReadWrite on a CustomObject with a MasterDetail relationship field"
+-->
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <deploymentStatus>Deployed</deploymentStatus>
+    <label>OBJECT_LABEL</label>
+    <nameField>
+        <displayFormat>PREFIX-{0000}</displayFormat>
+        <label>OBJECT_LABEL Name</label>
+        <type>AutoNumber</type>
+    </nameField>
+    <pluralLabel>OBJECT_LABEL_PLURAL</pluralLabel>
+    <sharingModel>ControlledByParent</sharingModel>
+</CustomObject>

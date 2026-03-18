@@ -1,0 +1,37 @@
+<!--
+  Custom Object Template
+
+  File path: force-app/main/default/objects/OBJECT_NAME__c/OBJECT_NAME__c.object-meta.xml
+
+  Replace:
+    - OBJECT_LABEL: The human-readable name (e.g., "Offer")
+    - OBJECT_LABEL_PLURAL: Plural form (e.g., "Offers")
+
+  Name field options:
+    - Text: User enters a name manually
+    - AutoNumber: System generates (change <type> and add <displayFormat>)
+
+  NOTE: If this object will have a Master-Detail relationship as a child,
+  use custom-object-controlled-by-parent.xml instead.
+-->
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <deploymentStatus>Deployed</deploymentStatus>
+    <label>OBJECT_LABEL</label>
+    <nameField>
+        <label>OBJECT_LABEL Name</label>
+        <type>Text</type>
+    </nameField>
+    <pluralLabel>OBJECT_LABEL_PLURAL</pluralLabel>
+    <sharingModel>ReadWrite</sharingModel>
+</CustomObject>
+
+<!--
+  AutoNumber variant — replace the <nameField> block with:
+
+    <nameField>
+        <displayFormat>PREFIX-{0000}</displayFormat>
+        <label>OBJECT_LABEL Name</label>
+        <type>AutoNumber</type>
+    </nameField>
+-->
