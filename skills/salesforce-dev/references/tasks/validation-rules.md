@@ -69,7 +69,7 @@ Validation rules do NOT require FLS or profile changes. Deploy just the object f
 ```bash
 sf project deploy start \
   --source-dir force-app/main/default/objects/Contact \
-  --target-org <alias> --dry-run --json 2>&1 | \
+  --target-org <alias> --dry-run --json | \
   jq '{status: .result.status, failures: [.result.details.componentFailures[]? | {fullName, problem}]}'
 ```
 
@@ -78,7 +78,7 @@ sf project deploy start \
 ```bash
 sf project retrieve start \
   --metadata "ValidationRule:Contact.My_Rule_Name" \
-  --target-org <alias> --json 2>&1 | \
+  --target-org <alias> --json | \
   jq '[.result.files[] | {state, fullName, type}]'
 ```
 
@@ -87,6 +87,6 @@ sf project retrieve start \
 ```bash
 sf data query \
   --query "SELECT Id, ValidationName, Active, ErrorConditionFormula, ErrorMessage FROM ValidationRule WHERE EntityDefinition.QualifiedApiName = 'Contact'" \
-  --target-org <alias> --use-tooling-api --json 2>&1 | \
+  --target-org <alias> --use-tooling-api --json | \
   jq '[.result.records[] | {ValidationName, Active, ErrorConditionFormula, ErrorMessage}]'
 ```

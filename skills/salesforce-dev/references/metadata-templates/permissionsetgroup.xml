@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- File path: force-app/main/default/permissionsetgroups/<Group_API_Name>.permissionsetgroup-meta.xml -->
+<!-- Bundle one or more PermissionSets and (optionally) one or more MutingPermissionSets. -->
+<!-- The <permissionSets> and <mutingPermissionSets> values are the API names (no extension). -->
+<PermissionSetGroup xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Sales User</label>
+    <description>Permission set group for the Sales User persona.</description>
+    <!-- One <permissionSets> per included permission set -->
+    <permissionSets>Account_Access</permissionSets>
+    <!-- One <mutingPermissionSets> per included muting permission set (optional) -->
+    <mutingPermissionSets>Sales_User_Muted</mutingPermissionSets>
+</PermissionSetGroup>

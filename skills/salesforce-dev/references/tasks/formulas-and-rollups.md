@@ -116,6 +116,6 @@ Both formula and roll-up summary fields follow the standard deployment workflow.
 sf project deploy start \
   --source-dir force-app/main/default/objects/Account/fields/My_Rollup__c.field-meta.xml \
   --source-dir force-app/main/default/profiles/Admin.profile-meta.xml \
-  --target-org <alias> --dry-run --json 2>&1 | \
+    --target-org <alias> --dry-run --json | \
   jq '{status: .result.status, failures: [.result.details.componentFailures[]? | {fullName, problem}]}'
 ```

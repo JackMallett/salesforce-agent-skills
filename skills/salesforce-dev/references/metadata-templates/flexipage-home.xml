@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Home FlexiPage template — canonical template name and typical components.
+
+  CANONICAL VALUES (do NOT guess these — they are not discoverable from error messages):
+    <type>HomePage</type>
+    <template><name>home:desktopTemplate</name></template>
+
+  Common Home page component FQNs:
+    forceChatter:exposedFeed                     — Chatter feed tile.
+                                                   Property: context = "TO" (mapped from
+                                                   the App Builder "Feed Type: To Me" UI).
+                                                   NOT feedType=ToMe.
+    home:eventContainer                          — "Today's Events" tile.
+    runtime_sales_activities:todayTaskContainer  — "Today's Tasks" tile.
+    flexipage:recentItems                        — "Recent Items" / "Recent Records" tile.
+                                                   Properties: entityNames (valueList of sObject
+                                                   API names), label, maxRecords.
+    forceChatter:publisher                       — Chatter publisher (post a status). context=GLOBAL.
+    flexipage:richText                           — Free-form rich text. richTextValue is HTML-escaped.
+
+  Working reference: force-app/main/default/flexipages/Support_Home_Page.flexipage-meta.xml
+
+  Region names for home:desktopTemplate: top, bottomLeft, bottomRight, sidebar.
+
+  If you need a Home FlexiPage with components or properties not listed here, retrieve a
+  standard one from the org first and copy values from the XML rather than guessing:
+    sf project retrieve start --metadata "FlexiPage:Marketing_Home_Page" --target-org <alias>
+-->
+<FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
+    <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>context</name>
+                    <value>TO</value>
+                </componentInstanceProperties>
+                <componentName>forceChatter:exposedFeed</componentName>
+                <identifier>forceChatter_exposedFeed</identifier>
+            </componentInstance>
+        </itemInstances>
+        <name>top</name>
+        <type>Region</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentName>home:eventContainer</componentName>
+                <identifier>home_eventContainer</identifier>
+            </componentInstance>
+        </itemInstances>
+        <name>bottomLeft</name>
+        <type>Region</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentName>runtime_sales_activities:todayTaskContainer</componentName>
+                <identifier>runtime_sales_activities_todayTaskContainer</identifier>
+            </componentInstance>
+        </itemInstances>
+        <name>bottomRight</name>
+        <type>Region</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>entityNames</name>
+                    <valueList>
+                        <valueListItems>
+                            <value>Case</value>
+                        </valueListItems>
+                    </valueList>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>label</name>
+                    <value>Recent Cases</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>maxRecords</name>
+                    <value>5</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:recentItems</componentName>
+                <identifier>flexipage_recentItems</identifier>
+            </componentInstance>
+        </itemInstances>
+        <name>sidebar</name>
+        <type>Region</type>
+    </flexiPageRegions>
+    <masterLabel>My Home Page</masterLabel>
+    <template>
+        <name>home:desktopTemplate</name>
+    </template>
+    <type>HomePage</type>
+</FlexiPage>

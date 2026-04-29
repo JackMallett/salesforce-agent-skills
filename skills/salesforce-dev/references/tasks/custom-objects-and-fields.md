@@ -14,6 +14,10 @@ Key decisions when creating an object:
 - **Name field type**: `Text` (user enters a name) or `AutoNumber` (system generates, e.g. `OF-{0000}`)
 - **Sharing model**: `ReadWrite` for standalone objects, `ControlledByParent` for Master-Detail children
 - **Plural label**: Used in tab names and list views
+- **Search**: Set `<enableSearch>true</enableSearch>` to allow records to appear in search results
+- **Starts with vowel**: Set `<startsWith>Vowel</startsWith>` if the label begins with a vowel sound (e.g., "Energy Audit" → "an Energy Audit")
+- **Feed tracking**: Set `<enableFeeds>true</enableFeeds>` to enable Chatter feed tracking. Add `<trackFeedHistory>true</trackFeedHistory>` to individual fields. See [ui-customization.md](ui-customization.md#feed-tracking-chatter).
+- **Custom tab**: A tab is required to make the object accessible in Lightning apps. See [custom-tab.xml](../metadata-templates/custom-tab.xml).
 
 ### 2. Add custom fields
 
@@ -69,7 +73,7 @@ Deploy the object, fields, and profile together:
 sf project deploy start \
   --source-dir force-app/main/default/objects/MyObject__c \
   --source-dir force-app/main/default/profiles/Admin.profile-meta.xml \
-  --target-org <alias> --dry-run --json 2>&1 | \
+  --target-org <alias> --dry-run --json | \
   jq '{status: .result.status, files: [.result.files[] | {state, fullName, type}], failures: [.result.details.componentFailures[]? | {fullName, problem}]}'
 ```
 
@@ -80,7 +84,7 @@ If no failures, deploy for real (remove `--dry-run`).
 ```bash
 sf project retrieve start \
   --metadata "CustomObject:MyObject__c" \
-  --target-org <alias> --json 2>&1 | \
+  --target-org <alias> --json | \
   jq '[.result.files[] | {state, fullName, type}]'
 ```
 
@@ -89,7 +93,7 @@ This captures auto-generated fields the org adds: action overrides, `trackTrendi
 ### 6. Verify
 
 ```bash
-sf sobject describe --sobject MyObject__c --target-org <alias> --json 2>&1 | \
+sf sobject describe --sobject MyObject__c --target-org <alias> --json | \
   jq '[.result.fields[] | select(.custom == true) | {name, type, label}]'
 ```
 
@@ -103,7 +107,7 @@ Follow steps 2-6 above. When adding fields to an object that already exists in t
 sf project deploy start \
   --source-dir force-app/main/default/objects/MyObject__c/fields/NewField__c.field-meta.xml \
   --source-dir force-app/main/default/profiles/Admin.profile-meta.xml \
-  --target-org <alias> --dry-run --json 2>&1 | \
+  --target-org <alias> --dry-run --json | \
   jq '{status: .result.status, failures: [.result.details.componentFailures[]? | {fullName, problem}]}'
 ```
 

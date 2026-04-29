@@ -1,6 +1,14 @@
 # SF CLI Command Reference
 
-All commands output JSON when using the `--json` flag. This reference documents the response shape for each command and provides `jq` one-liners for extracting useful information.
+All commands output JSON when using the `--json` flag. This reference documents the response shape for each command.
+
+## When to Use `jq`
+
+**Don't use `jq` for deploy, dry-run, retrieve, org display, or org list.** These commands return small, readable JSON. Just use `--json` and read the output directly.
+
+**Do use `jq` for `sf sobject describe` and `sf data query`** with many records — these can return large output where filtering is valuable.
+
+**Never use `2>&1 | jq`.** The SF CLI writes warnings (e.g., update notices) to stderr. Redirecting stderr into jq with `2>&1` produces invalid JSON input and breaks parsing. When using jq, pipe only stdout: `--json | jq '...'`.
 
 ## sf project deploy start
 
@@ -66,18 +74,13 @@ sf project deploy start \
 }
 ```
 
-### Recommended jq One-Liners
+### Reading the Output
 
-```bash
-# Check status and list deployed files
-... --json 2>&1 | jq '{status: .result.status, files: [.result.files[] | {state, fullName, type}]}'
-
-# Check for failures (use this with --dry-run)
-... --json 2>&1 | jq '{status: .result.status, failures: [.result.details.componentFailures[]? | {fullName, problem}]}'
-
-# Full summary with failures
-... --json 2>&1 | jq '{status: .result.status, files: [.result.files[] | {state, fullName, type}], failures: [.result.details.componentFailures[]? | {fullName, problem}]}'
-```
+The output is small enough to read directly. Key fields to check:
+- `result.status` — `"Succeeded"`, `"Failed"`, or `"SucceededPartial"`
+- `result.numberComponentErrors` — should be `0`
+- `result.details.componentFailures` — should be empty; if not, each entry has `fullName` and `problem`
+- `result.files` — array of `{fullName, type, state}` for each deployed component
 
 ---
 
@@ -120,12 +123,9 @@ sf project retrieve start \
 }
 ```
 
-### Recommended jq One-Liners
+### Reading the Output
 
-```bash
-# List retrieved files
-... --json 2>&1 | jq '[.result.files[] | {state, fullName, type}]'
-```
+The output is small enough to read directly. Check `result.files` for the list of retrieved components and their `state` (`"Changed"`, `"Created"`, `"Unchanged"`).
 
 ---
 
@@ -181,19 +181,19 @@ The response is large. Key sections:
 
 ```bash
 # List all custom fields with type
-... --json 2>&1 | jq '[.result.fields[] | select(.custom == true) | {name, type, label}]'
+... --json | jq '[.result.fields[] | select(.custom == true) | {name, type, label}]'
 
 # List all fields (custom and standard)
-... --json 2>&1 | jq '[.result.fields[] | {name, type, custom}]'
+... --json | jq '[.result.fields[] | {name, type, custom}]'
 
 # Get just field names
-... --json 2>&1 | jq '[.result.fields[].name]'
+... --json | jq '[.result.fields[].name]'
 
 # Check if a specific field exists
-... --json 2>&1 | jq '[.result.fields[] | select(.name == "Price__c")]'
+... --json | jq '[.result.fields[] | select(.name == "Price__c")]'
 
 # List child relationships
-... --json 2>&1 | jq '[.result.childRelationships[] | {childSObject, field, relationshipName}]'
+... --json | jq '[.result.childRelationships[] | {childSObject, field, relationshipName}]'
 ```
 
 ---
@@ -241,13 +241,13 @@ sf data query \
 
 ```bash
 # Get records as clean JSON (remove attributes metadata)
-... --json 2>&1 | jq '[.result.records[] | del(.attributes)]'
+... --json | jq '[.result.records[] | del(.attributes)]'
 
 # Get record count
-... --json 2>&1 | jq '.result.totalSize'
+... --json | jq '.result.totalSize'
 
 # Get specific fields from records
-... --json 2>&1 | jq '[.result.records[] | {id: .Id, name: .Name}]'
+... --json | jq '[.result.records[] | {id: .Id, name: .Name}]'
 ```
 
 ### Tooling API Examples
@@ -258,15 +258,183 @@ The Tooling API lets you query metadata objects:
 # List all custom fields on an object
 sf data query \
   --query "SELECT Id, DeveloperName FROM CustomField WHERE TableEnumOrId = 'MyObject__c'" \
-  --target-org <alias> --use-tooling-api --json 2>&1 | \
+  --target-org <alias> --use-tooling-api --json | \
   jq '[.result.records[] | {id: .Id, name: .DeveloperName}]'
 
 # Check if a custom object exists
 sf data query \
   --query "SELECT Id, DeveloperName FROM CustomObject WHERE DeveloperName = 'MyObject'" \
-  --target-org <alias> --use-tooling-api --json 2>&1 | \
+  --target-org <alias> --use-tooling-api --json | \
   jq '.result.totalSize'
 ```
+
+---
+
+## sf apex run
+
+Execute anonymous Apex in an org.
+
+### Syntax
+
+```bash
+sf apex run \
+  --target-org <alias> \
+  --file <path-to-apex-file> \
+  --json
+```
+
+**Common flags:**
+- `--file <path>` — Read Apex code from a local file instead of using interactive stdin
+- `--api-version <value>` — Override the API version used for the request
+
+### When to use it
+
+Use this after deploying an Apex class when a Trailhead unit or manual verification step requires running a method such as `MyClass.myMethod(5);` in Execute Anonymous.
+
+For non-interactive automation, prefer a temp file over interactive mode:
+
+```bash
+tmpfile=$(mktemp /tmp/run-apex.XXXXXX.apex)
+printf 'AccountHandler.insertAccount(5);\n' > "$tmpfile"
+sf apex run --target-org <alias> --file "$tmpfile" --json
+```
+
+### Response Shape
+
+```json
+{
+  "status": 0,
+  "result": {
+    "success": true,
+    "compiled": true,
+    "compileProblem": "",
+    "exceptionMessage": "",
+    "exceptionStackTrace": "",
+    "line": -1,
+    "column": -1,
+    "logs": "...debug log text..."
+  },
+  "warnings": []
+}
+```
+
+### Reading the Output
+
+Check these fields directly in the JSON output:
+- `result.compiled` — should be `true`
+- `result.success` — should be `true`
+- `result.compileProblem` — populated when the anonymous Apex failed to compile
+- `result.exceptionMessage` — populated when the code compiled but threw at runtime
+- `result.logs` — raw debug log text from the execution
+
+---
+
+## sf package install
+
+Install a package version into an org.
+
+### Syntax
+
+```bash
+sf package install \
+  --package <04t-version-id> \
+  --target-org <alias> \
+  --wait <minutes> \
+  --publish-wait <minutes> \
+  --no-prompt \
+  --json
+```
+
+**Common flags:**
+- `--package <04t...>` — Subscriber package version ID to install
+- `--wait <minutes>` — How long to wait for installation completion
+- `--publish-wait <minutes>` — How long to wait for package availability before install starts
+- `--no-prompt` — Non-interactive install (required for automation)
+
+### Response Shape
+
+```json
+{
+  "status": 0,
+  "result": {
+    "Id": "0Hf...",
+    "SubscriberPackageVersionKey": "04t...",
+    "Status": "SUCCESS",
+    "Errors": null
+  },
+  "warnings": []
+}
+```
+
+### Reading the Output
+
+Check these fields directly in the JSON output:
+- `result.Status` — should be `"SUCCESS"`
+- `result.Errors` — should be `null`
+- `result.SubscriberPackageVersionKey` — confirms which package version was installed
+
+---
+
+## sf data tree import
+
+Import related sample data from a plan file.
+
+### Syntax
+
+```bash
+sf data tree import \
+  --plan <path-to-plan.json> \
+  --target-org <alias> \
+  --json
+```
+
+### When to use it
+
+Use this for seeded sample data or relationship-heavy fixtures where the plan file manages cross-record references.
+
+### Response Shape
+
+Successful imports can be terse in terminal wrappers. Verify success by querying the destination objects afterward when needed.
+
+Error responses look like this:
+
+```json
+{
+  "name": "SfError",
+  "message": "Data Import failed",
+  "exitCode": 1,
+  "data": [
+    {
+      "referenceId": "18HenryStRef",
+      "StatusCode": "REQUIRED_FIELD_MISSING",
+      "Message": "Required fields are missing: [Street_Address__c]",
+      "fields": "Street_Address__c"
+    }
+  ]
+}
+```
+
+### Validation Pattern
+
+After import, verify record creation directly:
+
+```bash
+sf data query --query "SELECT COUNT() FROM Broker__c" --target-org <alias> --json
+sf data query --query "SELECT COUNT() FROM Property__c" --target-org <alias> --json
+```
+
+For `COUNT()` queries, the row count is in `result.totalSize`; `result.records` may be empty.
+
+### Common Gotcha
+
+If `sf data tree import` fails with `REQUIRED_FIELD_MISSING`, the data plan may be older than the installed schema. Describe the target object first:
+
+```bash
+sf sobject describe --sobject Property__c --target-org <alias> --json | \
+  jq '[.result.fields[] | select(.name == "Street_Address__c" or .name == "Address__c") | {name, nillable, createable}]'
+```
+
+Then patch the data payload to supply the required field before retrying the import.
 
 ---
 
@@ -310,15 +478,9 @@ sf org list --json
 }
 ```
 
-### Recommended jq One-Liners
+### Reading the Output
 
-```bash
-# List all connected orgs with alias and status
-... --json 2>&1 | jq '[.result.nonScratchOrgs[] | {alias, username, connectedStatus}]'
-
-# Find a specific org by alias
-... --json 2>&1 | jq '[.result.nonScratchOrgs[] | select(.alias == "my-org")]'
-```
+Small enough to read directly. Orgs are grouped under `result.nonScratchOrgs`, `result.scratchOrgs`, `result.sandboxes`, etc.
 
 ---
 
@@ -353,15 +515,9 @@ sf org display \
 }
 ```
 
-### Recommended jq One-Liners
+### Reading the Output
 
-```bash
-# Get org instance URL
-... --json 2>&1 | jq -r '.result.instanceUrl'
-
-# Get connection summary
-... --json 2>&1 | jq '{alias: .result.alias, username: .result.username, url: .result.instanceUrl, status: .result.connectedStatus}'
-```
+Small enough to read directly. Key fields: `result.instanceUrl`, `result.username`, `result.connectedStatus`.
 
 ---
 
@@ -379,12 +535,16 @@ sf data create record \
   --json
 ```
 
-### Recommended jq One-Liner
+### Reading the Output
 
-```bash
-# Get the new record ID
-... --json 2>&1 | jq -r '.result.id'
-```
+Small output — the new record ID is at `result.id`.
+
+### Notable record types you might need to insert
+
+| sObject | Notes |
+|---|---|
+| `User` | `sf org create user` is **scratch-org only**. For Trailhead Playgrounds, sandboxes, and production, use `sf data create record --sobject User`. Required: `FirstName`, `LastName`, `Alias`, `Email`, `Username` (globally unique across all Salesforce orgs), `ProfileId`, `TimeZoneSidKey`, `LocaleSidKey`, `EmailEncodingKey`, `LanguageLocaleKey`. See [users-and-sharing.md](../tasks/users-and-sharing.md). |
+| `PermissionSetAssignment` | Pass either `PermissionSetId` (regular permset) **or** `PermissionSetGroupId` (group), never both — passing both errors with `INVALID_CROSS_REFERENCE_KEY`. |
 
 ---
 
@@ -426,3 +586,4 @@ Common errors:
 | `INVALID_FIELD` | Field doesn't exist on the queried object |
 | `INSUFFICIENT_ACCESS_OR_READONLY` | Permission issue — check profile/FLS |
 | `MALFORMED_QUERY` | SOQL syntax error |
+| `REQUIRED_FIELD_MISSING` | Data insert or import omitted a required field; describe the object and update the payload |

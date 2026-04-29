@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- File path: force-app/main/default/mutingpermissionsets/<Name>.mutingpermissionset-meta.xml -->
+<!-- A MutingPermissionSet uses the SAME schema as PermissionSet. -->
+<!-- Semantics are inverted: a <true> value means "MUTE this permission within the group". -->
+<!-- A muting permission set is only effective when referenced from a PermissionSetGroup -->
+<!-- via <mutingPermissionSets>. It has no effect on its own. -->
+<MutingPermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Sales User Muted</label>
+    <description>Mutes elevated Account permissions for sales reps within the Sales User permission set group.</description>
+    <!-- Mute object permissions: setting allowDelete=true here REMOVES delete from the group -->
+    <objectPermissions>
+        <allowCreate>false</allowCreate>
+        <allowDelete>true</allowDelete>
+        <allowEdit>false</allowEdit>
+        <allowRead>false</allowRead>
+        <modifyAllRecords>true</modifyAllRecords>
+        <object>Account</object>
+        <viewAllRecords>true</viewAllRecords>
+    </objectPermissions>
+    <!-- Mute field permissions: editable=true here REMOVES edit access from the group -->
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Account.AnnualRevenue</field>
+        <readable>false</readable>
+    </fieldPermissions>
+</MutingPermissionSet>

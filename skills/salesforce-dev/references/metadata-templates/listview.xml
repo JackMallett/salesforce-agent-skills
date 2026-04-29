@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- File path: force-app/main/default/objects/<ObjectName>/listViews/<ViewName>.listView-meta.xml -->
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VIEW_API_NAME</fullName>
+    <!-- filterScope: Everything (all records), Mine (my records), Queue, etc. -->
+    <filterScope>Everything</filterScope>
+    <filters>
+        <!--
+          IMPORTANT: Filter field names use OBJECT.FIELD_NAME format for standard objects.
+          NOT the API field name directly. Examples:
+            OPPORTUNITY.STAGE_NAME  (not StageName)
+            OPPORTUNITY.CLOSE_DATE  (not CloseDate)
+            OPPORTUNITY.AMOUNT      (not Amount)
+            OPPORTUNITY.PROBABILITY (not Probability)
+            OPPORTUNITY.CLOSED      (not IsClosed)
+            ACCOUNT.NAME            (not Name)
+          For custom fields, use the API name directly: MyField__c
+          Retrieve an existing list view to discover the correct field name format.
+        -->
+        <field>OPPORTUNITY.STAGE_NAME</field>
+        <!-- operation: equals, notEqual, lessThan, greaterThan, lessOrEqual, greaterOrEqual, contains, notContain, startsWith -->
+        <operation>equals</operation>
+        <!-- Multiple values separated by commas -->
+        <value>Proposal/Price Quote,Negotiation/Review</value>
+    </filters>
+    <filters>
+        <field>OPPORTUNITY.PROBABILITY</field>
+        <operation>greaterOrEqual</operation>
+        <value>50</value>
+    </filters>
+    <label>View Display Label</label>
+    <!-- Share with all internal users (makes it public). Omit sharedTo for private views. -->
+    <sharedTo>
+        <allInternalUsers></allInternalUsers>
+    </sharedTo>
+</ListView>

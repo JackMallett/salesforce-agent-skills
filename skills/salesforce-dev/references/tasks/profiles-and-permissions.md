@@ -45,9 +45,16 @@ You can deploy multiple profile files at once:
 ```bash
 sf project deploy start \
   --source-dir force-app/main/default/profiles/ \
-  --target-org <alias> --dry-run --json 2>&1 | \
+    --target-org <alias> --dry-run --json | \
   jq '{status: .result.status, failures: [.result.details.componentFailures[]? | {fullName, problem}]}'
 ```
+
+## Permission Set Groups
+
+For bundling multiple permission sets together (with optional muting), see
+[users-and-sharing.md](users-and-sharing.md) — covers `PermissionSetGroup`,
+`MutingPermissionSet`, and assigning a group via
+`PermissionSetAssignment`.
 
 ## Permission Sets as an Alternative
 
@@ -75,3 +82,5 @@ Permission set metadata follows a similar structure but lives under `force-app/m
 - **Ask the user** if they want to grant access to other profiles before deploying FLS for non-Admin profiles. Different orgs have different profile structures.
 - **Use permission sets** for granular access control rather than modifying standard profiles directly.
 - **Remember**: Required fields and Master-Detail fields do not need FLS entries. See [field-level-security.md](field-level-security.md).
+
+Repo note: profile XML files often vary at the top (extra nodes before/after `<custom>true</custom>`). If you must insert `<fieldPermissions>` into an existing profile file, anchor your edits on `<custom>true</custom>` rather than assuming a fixed header layout.

@@ -47,9 +47,115 @@ sf project deploy start \
   --target-org <alias> --json
 ```
 
-### For Other Profiles
+### For Multiple Profiles
 
-See [profiles-and-permissions.md](profiles-and-permissions.md) for granting FLS to profiles other than System Administrator.
+Profiles are the trickiest metadata type to work with safely. A full retrieve pulls FLS, object permissions, tab visibility, record type access, page layout assignments, and more. Deploying a retrieved-then-modified full profile risks **overwriting concurrent changes** to unrelated settings.
+
+The safe approach: deploy **minimal partial profile XMLs alongside the related field metadata**. When profiles are deployed alongside fields/objects, Salesforce does an **additive merge** — it only touches the permissions explicitly in your XML and leaves everything else untouched.
+
+#### Step 1: Find profile API names
+
+The display name you see in Salesforce Setup is NOT the API name used in metadata filenames. You need the API name to create the profile XML file.
+
+**Common standard profile mappings:**
+
+| Display Name | API Name (filename) |
+|---|---|
+| System Administrator | `Admin` |
+| Standard User | `Standard` |
+| Marketing User | `MarketingProfile` |
+| Contract Manager | `ContractManager` |
+| Read Only | `ReadOnly` |
+| Solution Manager | `SolutionManager` |
+| Standard Platform User | `StandardAul` |
+| Custom: Sales Profile | `Custom%3A Sales Profile` (URL-encoded colon) |
+
+**List all profiles in the org:**
+```bash
+sf data query -q "SELECT Id, Name FROM Profile" --target-org <alias>
+```
+
+**Map display names to API names via Tooling API:**
+
+The `Profile` sObject in the standard API only exposes `Name` (display name). To get the metadata API name, query the `Profile` object through the Tooling API which exposes the `FullName` field — this is the exact value you need for the filename:
+
+```bash
+sf data query \
+  -q "SELECT Id, Name, FullName FROM Profile WHERE Name IN ('System Administrator', 'Standard User', 'Custom: Sales Profile')" \
+  --target-org <alias> --use-tooling-api
+```
+
+The `FullName` column is the metadata API name. Use it as the filename: `<FullName>.profile-meta.xml`.
+
+**If FullName contains special characters** (like colons in custom profiles), URL-encode them in the filename: `:` → `%3A`. For example, `Custom: Sales Profile` → `Custom%3A Sales Profile.profile-meta.xml`.
+
+**Retrieve to confirm:** If you're unsure about the exact filename, retrieve the profile and let the CLI tell you:
+```bash
+sf project retrieve start --metadata "Profile:Admin" --target-org <alias>
+```
+The retrieved filename in the output is the authoritative API name.
+
+#### Step 2: Create a minimal profile XML per profile
+
+Each file contains ONLY the new `<fieldPermissions>` entries — nothing else:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<Profile xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Energy_Audit__c.Type_of_Installation__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Energy_Audit__c.Audit_Notes__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+</Profile>
+```
+
+Save each to `force-app/main/default/profiles/<APIName>.profile-meta.xml`.
+
+Set `<editable>false</editable>` for read-only access, `<editable>true</editable>` for read-write.
+
+#### Step 3: Deploy all profiles alongside the field metadata
+
+```bash
+sf project deploy start \
+  --source-dir force-app/main/default/objects/MyObject__c/fields/MyField__c.field-meta.xml \
+  --source-dir force-app/main/default/profiles/Admin.profile-meta.xml \
+  --source-dir force-app/main/default/profiles/Standard.profile-meta.xml \
+  --source-dir "force-app/main/default/profiles/Custom%3A Sales Profile.profile-meta.xml" \
+  --target-org <alias> --dry-run
+```
+
+Deploying the profiles **alongside the fields** is what triggers the safe additive merge behavior.
+
+#### Alternative: Permission Sets
+
+For multi-profile scenarios, Permission Sets are often cleaner — no profile wrangling needed:
+
+**File path**: `force-app/main/default/permissionsets/Energy_Audit_Access.permissionset-meta.xml`
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Energy Audit Access</label>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Energy_Audit__c.Type_of_Installation__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Energy_Audit__c.Audit_Notes__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+</PermissionSet>
+```
+
+Deploy the Permission Set, then assign it to users. This avoids profile complexity entirely and is the recommended approach when granting the same FLS to users across multiple profiles.
 
 ## Fields That Do NOT Need FLS Entries
 
@@ -73,7 +179,7 @@ Use the Tooling API (bypasses FLS):
 ```bash
 sf data query \
   --query "SELECT Id, DeveloperName FROM CustomField WHERE TableEnumOrId = 'MyObject__c'" \
-  --target-org <alias> --use-tooling-api --json 2>&1 | \
+  --target-org <alias> --use-tooling-api --json | \
   jq '[.result.records[] | {id: .Id, name: .DeveloperName}]'
 ```
 
@@ -84,7 +190,7 @@ If the field appears here but not in `sf sobject describe`, FLS is the problem.
 ```bash
 sf data query \
   --query "SELECT Id, Field, PermissionsRead, PermissionsEdit FROM FieldPermissions WHERE SobjectType = 'MyObject__c'" \
-  --target-org <alias> --json 2>&1 | \
+  --target-org <alias> --json | \
   jq '[.result.records[] | {field: .Field, read: .PermissionsRead, edit: .PermissionsEdit}]'
 ```
 
@@ -95,7 +201,7 @@ If your field is not listed, deploy the profile FLS as described above.
 After deploying the Admin profile with `<fieldPermissions>`:
 
 ```bash
-sf sobject describe --sobject MyObject__c --target-org <alias> --json 2>&1 | \
+sf sobject describe --sobject MyObject__c --target-org <alias> --json | \
   jq '[.result.fields[] | select(.custom == true) | {name, type, label}]'
 ```
 
